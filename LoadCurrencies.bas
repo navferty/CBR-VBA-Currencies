@@ -1,14 +1,35 @@
 Attribute VB_Name = "LoadCurrencies"
 Option Explicit
 
+Public Function GetTodayCurrency(currCode As String, volatileArg As Variant) As Variant 'decimal
+    Dim currItem As CurrencyRecord
+    Dim col As Collection
+    Set col = GetCurrency(currCode, DateAdd("d", -1, Date), Now)
+    
+    If col.Count = 0 Then
+        Exit Function
+    End If
+    
+    Set currItem = col.Item(col.Count)
+    GetTodayCurrency = currItem.CurrencyValue
+    
+    Debug.Print "Currency loaded, value is " + CStr(currItem.CurrencyValue)
+End Function
 
-' returns Collection on CurrencyRecord
-Public Function GetCurrency(currCode As String, startDate As Date, endDate As Date) As Collection
+Private Sub TestCurrLoad()
+    Dim col As Collection
+    Set col = GetCurrency("USD", #1/1/2020#, #2/2/2020#)
+    Stop
+End Sub
 
-    ' TODO move to static variable
+' returns Collection of CurrencyRecord's
+Private Function GetCurrency(currCode As String, startDate As Date, endDate As Date) As Collection
+
     Dim codeDict As Dictionary
     Set codeDict = New Dictionary
     codeDict.Add "USD", "R01235"
+    codeDict.Add "GBP", "R01035"
+    codeDict.Add "BYN", "R01090B"
     ' наполнить другими значениями
     
     Dim currCbrCode As String
@@ -19,7 +40,7 @@ Public Function GetCurrency(currCode As String, startDate As Date, endDate As Da
                 + "date_req1=" + Format(startDate, "dd/mm/yyyy") _
                 + "&date_req2=" + Format(endDate, "dd/mm/yyyy") _
                 + "&VAL_NM_RQ=" + currCbrCode
-    ' формат даты решает!
+    ' Date format is important!
     ' http://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=02/03/2020&date_req2=14/03/2020&VAL_NM_RQ=R01235
     
     Dim resp As DOMDocument60
