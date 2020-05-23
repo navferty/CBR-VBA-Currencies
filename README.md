@@ -6,6 +6,8 @@ Usage:
 =GetTodayCurrency("USD"; NOW())
 ```
 
-The function automatically loads currency:
+The second argument is used to force Excel recalculate formula and call VBA macro.
+
+The function automatically loads currency on open workbook:
 
 ![Demo](img.png)
